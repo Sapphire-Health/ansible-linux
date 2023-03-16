@@ -6,7 +6,7 @@
     tasks:
       - name: Ubuntu/Debian OS
         block:
-        - name: Update apt cache
+        - name: Install all apt updates
           apt:
             name: "*"
             state: latest
@@ -28,3 +28,7 @@
           debug:
             msg: "{{ result }}"
         when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+      - name: Reboot
+        reboot:
+          reboot_timeout: "{{ reboot_timeout | default('600') }}"
+        when: reboot is defined and reboot == true
