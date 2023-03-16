@@ -1,0 +1,29 @@
+---
+  - name: Playbook to show all updates
+    hosts: "{{ match_host }}"
+    gather_facts: true
+    become: true
+    tasks:
+      - name: Ubuntu/Debian OS
+        block:
+        - name: Update apt cache
+          apt:
+            update_cache: yes
+        - name: Get all apt updates
+          command: apt list --upgradable
+          register: result
+        - name: Show result
+          debug:
+            msg: "{{ result.stdout_lines }}"
+        when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+      - name: CentOS/RHEL OS
+        block:
+        - name: Get all yum updates
+          yum:
+            list: updates
+            update_cache: yes
+          register: result
+        - name: Show result
+          debug:
+            msg: "{{ result }}"
+        when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
