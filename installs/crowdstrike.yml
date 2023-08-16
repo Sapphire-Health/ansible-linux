@@ -11,6 +11,14 @@
     tasks:
       - name: Install Crowdstrike on Ubuntu
         block:
+          - name: set arch for x86_64
+            set_fact:
+              cs_arch: amd64
+            when: ansible_architecture == "x86_64"
+          - name: set arch for arm
+            set_fact:
+              cs_arch: "{{ ansible_architecture }}"
+            when: ansible_architecture != "x86_64"
           - name: determine whether crowdstrike is already installed
             command: dpkg-query -W falcon-sensor
             register: falcon_sensor_check_deb
@@ -18,7 +26,7 @@
             changed_when: falcon_sensor_check_deb.rc == 1
           - name: download crowdstrike installer
             get_url:
-              url: "{{ http_fileserver }}/falcon-sensor_{{ falcon_version }}_{{ ansible_architecture }}.deb"
+              url: "{{ http_fileserver }}/falcon-sensor_{{ falcon_version }}_{{ cs_arch }}.deb"
               dest: /tmp/
               mode: '0755'
             register: download
@@ -27,6 +35,9 @@
             apt: deb="{{ download.dest }}"
             register: apt_install
             when: falcon_sensor_check_deb.rc == 1
+          - name: Show result
+            debug:
+              msg: "{{ apt_install }}"
         when: ansible_distribution == 'Ubuntu'
       - name: Install Crowdstrike on RHEL or CentOS
         block:
@@ -57,5 +68,5 @@
         when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
       - name: Configure crowdstrike CID
         command: "/opt/CrowdStrike/falconctl -s --cid={{ CID }}"
-        when: yum_install.changed == true or apt_install == true
+        when: yum_install.changed == true or apt_install.changed == true
         notify: start and enable falcon-sensor service
