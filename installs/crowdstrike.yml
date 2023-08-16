@@ -35,9 +35,9 @@
             apt: deb="{{ download.dest }}"
             register: apt_install
             when: falcon_sensor_check_deb.rc == 1
-          - name: Show result
-            debug:
-              msg: "{{ apt_install }}"
+          #- name: Show result
+          #  debug:
+          #    msg: "{{ apt_install }}"
         when: ansible_distribution == 'Ubuntu'
       - name: Install Crowdstrike on RHEL or CentOS
         block:
