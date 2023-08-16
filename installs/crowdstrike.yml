@@ -1,0 +1,61 @@
+---
+  - name: Playbook to deploy crowdstrike
+    hosts: "{{ match_host }}"
+    become: yes
+    handlers:
+      - name: start and enable falcon-sensor service
+        service:
+          name: falcon-sensor
+          state: started
+          enabled: yes
+    tasks:
+      - name: Install Crowdstrike on Ubuntu
+        block:
+          - name: determine whether crowdstrike is already installed
+            command: dpkg-query -W falcon-sensor
+            register: falcon_sensor_check_deb
+            failed_when: falcon_sensor_check_deb.rc > 1
+            changed_when: falcon_sensor_check_deb.rc == 1
+          - name: download crowdstrike installer
+            get_url:
+              url: "{{ http_fileserver }}/falcon-sensor_{{ falcon_version }}_{{ ansible_architecture }}.deb"
+              dest: /tmp/
+              mode: '0755'
+            register: download
+            when: falcon_sensor_check_deb.rc == 1
+          - name: Install falcon-sensor
+            apt: deb="{{ download.dest }}"
+            register: apt_install
+            when: falcon_sensor_check_deb.rc == 1
+        when: ansible_distribution == 'Ubuntu'
+      - name: Install Crowdstrike on RHEL or CentOS
+        block:
+          - name: determine whether crowdstrike is already installed
+            yum:
+              list: falcon-sensor
+            register: falcon_sensor_check_yum
+          #- name: Show result
+          #  debug:
+          #    msg: "{{ falcon_sensor_check_yum.results|length }}"
+          - name: download crowdstrike installer
+            get_url:
+              url: "{{ http_fileserver }}/falcon-sensor-{{ falcon_version }}.el{{ ansible_distribution_major_version }}.{{ ansible_architecture }}.rpm"
+              dest: /tmp/
+              mode: '0755'
+            register: download
+            when: falcon_sensor_check_yum.results | length == 0
+          - name: Install falcon-sensor
+            yum:
+              name: "{{ download.dest }}"
+              disable_gpg_check: yes
+              state: present
+            register: yum_install
+            when: falcon_sensor_check_yum.results | length == 0
+          #- name: Show result
+          #  debug:
+          #    msg: "{{ yum_install }}"
+        when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+      - name: Configure crowdstrike CID
+        command: "/opt/CrowdStrike/falconctl -s --cid={{ CID }}"
+        when: yum_install.changed == true or apt_install == true
+        notify: start and enable falcon-sensor service
