@@ -15,10 +15,14 @@
             set_fact:
               cs_arch: amd64
             when: ansible_architecture == "x86_64"
-          - name: set arch for arm
+          - name: set arch for aarch64
+            set_fact:
+              cs_arch: arm64
+            when: ansible_architecture == "aarch64"
+          - name: Use default ansible_architecture value
             set_fact:
               cs_arch: "{{ ansible_architecture }}"
-            when: ansible_architecture != "x86_64"
+            when: ansible_architecture != "x86_64" and ansible_architecture != "aarch64"
           - name: determine whether crowdstrike is already installed
             command: dpkg-query -W falcon-sensor
             register: falcon_sensor_check_deb
