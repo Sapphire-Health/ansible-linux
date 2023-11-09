@@ -4,6 +4,9 @@
     gather_facts: true
     become: true
     tasks:
+      - name: Show distribution
+        debug:
+          msg: "{{ ansible_distribution }}"
       - name: Ubuntu/Debian OS
         block:
         - name: Install all apt updates
@@ -27,7 +30,7 @@
         - name: Show result
           debug:
             msg: "{{ result }}"
-        when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+        when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat'
       - name: Reboot
         reboot:
           reboot_timeout: "{{ reboot_timeout | default('600') }}"
