@@ -1,0 +1,7 @@
+---
+  roles:
+    - name: ansible-role-subscription-manager
+      src: https://github.com/Sapphire-Health/ansible-role-subscription-manager.git
+      scm: 'git'
+      version: origin/master
+...
