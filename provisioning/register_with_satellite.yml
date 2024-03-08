@@ -1,0 +1,6 @@
+---
+  - name: Playbook to register hosts with Satellite
+    hosts: "{{ match_host }}"
+    become: yes
+    roles:
+      - role: ansible-role-subscription-manager
