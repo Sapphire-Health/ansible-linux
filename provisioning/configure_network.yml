@@ -3,4 +3,4 @@
     hosts: "{{ match_host }}"
     become: yes
     roles:
-      - role: rhel-system-roles.network
+      - role: linux-system-roles.network
