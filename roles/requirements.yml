@@ -4,4 +4,5 @@
       src: https://github.com/Sapphire-Health/ansible-role-subscription-manager.git
       scm: 'git'
       version: origin/master
+    - name: rhel-system-roles.network
 ...

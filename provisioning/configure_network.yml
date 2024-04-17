@@ -1,0 +1,6 @@
+---
+  - name: Playbook to configure network
+    hosts: "{{ match_host }}"
+    become: yes
+    roles:
+      - role: rhel-system-roles.network
