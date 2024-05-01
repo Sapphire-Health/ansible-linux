@@ -89,6 +89,9 @@
             shell: "realm list | grep -i -q {{ ADDomain }} && echo -n JOINED || echo -n NOTJOINED"
             register: domain_check
             changed_when: domain_check.stdout != 'JOINED'
+          - name: Show domain status
+            debug:
+              msg: "{{domain_check}}"
           - name: Install pexpect using pip
             pip:
               name: pexpect
