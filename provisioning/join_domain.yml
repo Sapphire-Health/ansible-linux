@@ -130,6 +130,27 @@
               line: ad_gpo_access_control = disabled
               insertafter: '^\[domain/(.*?)\]$'
             notify: restart auth services
+          - name: Configure override_gid in sssd.conf
+            ansible.builtin.lineinfile:
+              path: /etc/sssd/sssd.conf
+              regexp: '^override_gid = '
+              line: override_gid = 1004
+              insertafter: '^\[domain/(.*?)\]$'
+            notify: restart auth services
+          - name: Configure ad_enabled_domains in sssd.conf
+            ansible.builtin.lineinfile:
+              path: /etc/sssd/sssd.conf
+              regexp: '^ad_enabled_domains = '
+              line: "ad_enabled_domains = {{ ADDomain | lower }}"
+              insertafter: '^\[domain/(.*?)\]$'
+            notify: restart auth services
+          - name: Configure ignore_group_members in sssd.conf
+            ansible.builtin.lineinfile:
+              path: /etc/sssd/sssd.conf
+              regexp: '^ignore_group_members = '
+              line: ignore_group_members = True
+              insertafter: '^\[domain/(.*?)\]$'
+            notify: restart auth services
           - name: Configure udp_preference_limit in /etc/krb5.conf
             ansible.builtin.lineinfile:
               path: /etc/krb5.conf
