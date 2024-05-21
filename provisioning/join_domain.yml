@@ -137,7 +137,7 @@
             ansible.builtin.lineinfile:
               path: /etc/sssd/sssd.conf
               regexp: '^override_gid = '
-              line: override_gid = 1004
+              line: override_gid = 1102
               insertafter: '^\[domain/(.*?)\]$'
             notify: restart auth services
           - name: Configure ad_enabled_domains in sssd.conf
