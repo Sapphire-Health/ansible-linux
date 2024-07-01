@@ -1,5 +1,5 @@
 ---
-  - name: Playbook to join hosts to Active Directory domain
+  - name: Create local Users and Groups
     hosts: "{{ match_host }}"
     tasks:
     - name: Create groups
